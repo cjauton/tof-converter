@@ -28,15 +28,49 @@ impl fmt::Display for UnsupportedUnitError {
 
 impl Error for UnsupportedUnitError {}
 
-
-fn calculate_energy( time: Time, length: Length ) -> Energy {
-
-    let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
-    let energy: Energy = m * (length * length) / (2.0 *time * time);
-
-    energy
-    
+#[derive(Debug)]
+enum DivideByZeroError {
+    LengthIsZero,
+    TimeIsZero,
 }
+
+impl fmt::Display for DivideByZeroError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            DivideByZeroError::LengthIsZero => write!(f, "Length is zero, cannot divide by zero"),
+            DivideByZeroError::TimeIsZero => write!(f, "Time is zero, cannot divide by zero"),
+        }
+    }
+}
+
+impl std::error::Error for DivideByZeroError {}
+
+
+// fn calculate_energy( time: Time, length: Length ) -> Energy {
+
+//     let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
+//     let energy: Energy = m * (length * length) / (2.0 *time * time);
+
+//     energy
+    
+// }
+
+fn calculate_energy(time: Time, length: Length) -> Result<Energy, DivideByZeroError> {
+    let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
+
+    // Check if either time or length is zero
+    if time == Time::new::<second>(0.0) {
+        return Err(DivideByZeroError::TimeIsZero);
+    }
+    if length == Length::new::<meter>(0.0) {
+        return Err(DivideByZeroError::LengthIsZero);
+    }
+
+    let energy: Energy = m * (length * length) / (2.0 * time * time);
+
+    Ok(energy)
+}
+
 
 
 // Functions to parse length and time inputs
@@ -75,15 +109,15 @@ enum EnergyUnit {
 struct Cli {
 
     /// Flight path length from source to target in units of (cm, m, km).
-    #[arg(short,long, num_args(2), value_names = ["LENGTH","UNIT"])]
+    #[arg(required = true, short, long, num_args(2), value_names = ["LENGTH","UNIT"])]
     length_fp: Vec<String>,
 
     /// Time-of-Flight to convert to neutron Energy in units of (ns, us, ms, s).
-    #[arg(short,long, num_args(2), value_names = ["TOF","UNIT"])]
+    #[arg(required = true, short, long, num_args(2), value_names = ["TOF","UNIT"])]
     tof: Vec<String>,
 
     /// Desired neutron energy units of (eV, KeE, MeV, J).
-    #[arg(short,long, num_args(1), default_value = "eV")]
+    #[arg(short, long, num_args(1), default_value = "eV")]
     unit: Option<String>
 }
 
@@ -106,7 +140,7 @@ fn main() {
     let input_length_value: f32 = match cli.length_fp[0].parse() {
         Ok(value) => value,
         Err(err) => {
-            eprintln!("Error parsing length value: {}", err);
+            eprintln!("Error: parsing length value: {}", err);
             return;
         }
     };
@@ -115,7 +149,7 @@ fn main() {
     let input_time_value: f32 = match cli.tof[0].parse() {
         Ok(value) => value,
         Err(err) => {
-            eprintln!("Error parsing time value: {}", err);
+            eprintln!("Error: parsing time value: {}", err);
             return;
         }
     };
@@ -124,40 +158,52 @@ fn main() {
     let input_length_unit: &str = &cli.length_fp[1].trim().to_lowercase();
     let input_time_unit: &str = &cli.tof[1].trim().to_lowercase();
 
-    let length_quantity = match parse_length(input_length_value, input_length_unit) {
-        Ok(length) => length,
-        Err(err) => {
-            eprintln!("{}", err);
-            return;
-        }
-    };
+    // let length_quantity = match parse_length(input_length_value, input_length_unit) {
+    //     Ok(length) => length,
+    //     Err(err) => {
+    //         eprintln!("Error: {}", err);
+    //         return;
+    //     }
+    // };
 
-    let time_quantity = match parse_time(input_time_value, input_time_unit) {
-        Ok(time) => time,
-        Err(err) => {
-            eprintln!("{}", err);
-            return;
-        }
-    };
+    let length_quantity = parse_length(input_length_value, input_length_unit).unwrap_or_else(|err| {
+        eprintln!("Error: {}", err);
+        std::process::exit(1);
+    });
+
+    let time_quantity = parse_time(input_time_value, input_time_unit).unwrap_or_else(|err| {
+        eprintln!("Error: {}", err);
+        std::process::exit(1);
+    });
 
 
     let output_energy_unit: &str = &cli.unit.unwrap().trim().to_lowercase();
 
-    let energy_quantity: Energy = calculate_energy(time_quantity,length_quantity);
+    // let energy_quantity: Energy = calculate_energy(time_quantity,length_quantity);
 
-    let energy_unit = match parse_energy_unit(output_energy_unit) {
-        Ok(unit) => unit,
-        Err(err) => {
-            eprintln!("{}", err);
-            return;
-        }
-    };
+    let energy_quantity: Energy =  calculate_energy(time_quantity, length_quantity).unwrap_or_else(|err| {
+        eprintln!("Error: {}", err);
+        std::process::exit(1);
+    });
+
+    let energy_unit = parse_energy_unit(output_energy_unit).unwrap_or_else(|err| {
+        eprintln!("Error: {}", err);
+        std::process::exit(1);
+    });
 
     match energy_unit {
-        EnergyUnit::Electronvolt => println!("Energy = {}", energy_quantity.into_format_args(electronvolt, Abbreviation)),
-        EnergyUnit::Kiloelectronvolt => println!("Energy = {}", energy_quantity.into_format_args(kiloelectronvolt, Abbreviation)),
-        EnergyUnit::Megaelectronvolt => println!("Energy = {}", energy_quantity.into_format_args(megaelectronvolt, Abbreviation)),
-        EnergyUnit::Gigaelectronvolt => println!("Energy = {}", energy_quantity.into_format_args(gigaelectronvolt, Abbreviation)),
+        EnergyUnit::Electronvolt => {
+            println!("Energy = {}", energy_quantity.into_format_args(electronvolt, Abbreviation))
+        },
+        EnergyUnit::Kiloelectronvolt => {
+            println!("Energy = {}", energy_quantity.into_format_args(kiloelectronvolt, Abbreviation))
+        },
+        EnergyUnit::Megaelectronvolt => {
+            println!("Energy = {}", energy_quantity.into_format_args(megaelectronvolt, Abbreviation))
+        },
+        EnergyUnit::Gigaelectronvolt => {
+            println!("Energy = {}", energy_quantity.into_format_args(gigaelectronvolt, Abbreviation))
+        },
         EnergyUnit::Joule => println!("Energy = {}", energy_quantity.into_format_args(joule, Abbreviation)),
     }
 
