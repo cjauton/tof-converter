@@ -19,7 +19,9 @@ The program supports the following command-line arguments:
 - `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
 
 ### Usage
+
 If the binary is installed or added to path.
+
 ```bash
 tof-converter [OPTIONS] --l <LENGTH> <UNIT> --t <TOF> <UNIT>
 ```
