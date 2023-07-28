@@ -4,7 +4,7 @@ This is a simple command-line application written in Rust to calculate the energ
 
 ## Prerequisites
 
-- Rust programming language (https://www.rust-lang.org/learn/get-started)
+- Rust programming language (<https://www.rust-lang.org/learn/get-started>)
 
 ## How to Use
 
