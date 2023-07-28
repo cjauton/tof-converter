@@ -20,23 +20,23 @@ The program supports the following command-line arguments:
 
 ### Examples
 
-1 Calculate neutron energy in electronvolts (default unit):
+1. Calculate neutron energy in electronvolts (default unit):
 
-```bash
-cargo run -- --length_fp 1000 meters --tof 2 microseconds
-```
+    ```bash
+    cargo run -- --length_fp 1000 meters --tof 2 microseconds
+    ```
 
-2 Calculate neutron energy in megaelectronvolts:
+2. Calculate neutron energy in megaelectronvolts:
 
-```bash
-cargo run -- --length_fp 50 cm --tof 0.05 seconds --unit MeV
-```
+    ```bash
+    cargo run -- --length_fp 50 cm --tof 0.05 seconds --unit MeV
+    ```
 
-3 Calculate neutron energy in joules:
+3. Calculate neutron energy in joules:
 
-```bash
-cargo run -- --length_fp 1.5 km --tof 1000 nanoseconds --unit Joules
-```
+    ```bash
+    cargo run -- --length_fp 1.5 km --tof 1000 nanoseconds --unit Joules
+    ```
 
 ### Note
 
