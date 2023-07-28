@@ -8,13 +8,6 @@ use uom::si::energy::{electronvolt,kiloelectronvolt,megaelectronvolt,gigaelectro
 use uom::si::mass::kilogram;
 use uom::fmt::DisplayStyle::Abbreviation;
 
-// // fn convert_to_centimeters(value: Length) -> Length {
-// //     value.get::<centimeter>()
-// // }
-
-// // fn convert_to_meters(value: Length) -> Length {
-// //     value.get::<meter>()
-// // }
 
 fn calculate_energy( time: Time, length: Length ) -> Energy {
 
@@ -23,6 +16,25 @@ fn calculate_energy( time: Time, length: Length ) -> Energy {
     // energy.get::<electronvolt>().into()
     energy
     
+}
+
+fn parse_length(quantity: f32, unit: &str) -> Length {
+    match unit.trim().to_lowercase().as_str() {
+        "cm" | "centimeter" | "centimeters" => Length::new::<centimeter>(quantity),
+        "m" | "meter" | "meters" => Length::new::<meter>(quantity),
+        "km" | "kilometer" | "kilometers" => Length::new::<kilometer>(quantity),
+        _ => Length::new::<meter>(quantity),
+    }
+}
+
+fn parse_time(quantity: f32, unit: &str) -> Time {
+    match unit.trim().to_lowercase().as_str() {
+        "ns" | "nanosecond" | "nanoseconds" => Time::new::<nanosecond>(quantity),
+        "mus" | "us" | "microsecond" | "microseconds" => Time::new::<microsecond>(quantity),
+        "ms" | "millisecond" | "milliseconds" => Time::new::<millisecond>(quantity),
+        "s" | "second" | "seconds" => Time::new::<second>(quantity),
+        _ => Time::new::<second>(quantity),
+    }
 }
 
 
@@ -46,48 +58,50 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
 
-    let input_unit_length: &str = &cli.length_fp[1].trim().to_lowercase();
-    let input_unit_time: &str = &cli.tof[1].trim().to_lowercase();
-
-    let l = match input_unit_length{
-        "cm" | "meter" | "meters" => uom::si::f32::Length::new::<centimeter>(cli.length_fp[0].parse::<f32>().unwrap()),
-        "m" | "meter" | "meters" => uom::si::f32::Length::new::<meter>(cli.length_fp[0].parse::<f32>().unwrap()),
-        "km" | "kilometer" | "kilometers" => uom::si::f32::Length::new::<kilometer>(cli.length_fp[0].parse::<f32>().unwrap()),
-        _ =>  uom::si::f32::Length::new::<meter>(cli.length_fp[0].parse::<f32>().unwrap()),
-
+    // Parse length value
+    let input_length_value: f32 = match cli.length_fp[0].parse() {
+        Ok(value) => value,
+        Err(err) => {
+            eprintln!("Error parsing length value: {}", err);
+            return;
+        }
     };
 
-    let t = match input_unit_time{
-        "ns" | "nanosecond" | "nanoseconds" => uom::si::f32::Time::new::<nanosecond>(cli.tof[0].parse::<f32>().unwrap()),
-        "mus" | "us" | "microsecond" | "microseconds" => uom::si::f32::Time::new::<microsecond>(cli.tof[0].parse::<f32>().unwrap()),
-        "ms" | "millisecond" | "milliseconds" => uom::si::f32::Time::new::<millisecond>(cli.tof[0].parse::<f32>().unwrap()),
-        "s" | "second" | "seconds" => uom::si::f32::Time::new::<second>(cli.tof[0].parse::<f32>().unwrap()),
-        _ =>  uom::si::f32::Time::new::<second>(cli.tof[0].parse::<f32>().unwrap()),
-
+    // Parse time value
+    let input_time_value: f32 = match cli.tof[0].parse() {
+        Ok(value) => value,
+        Err(err) => {
+            eprintln!("Error parsing time value: {}", err);
+            return;
+        }
     };
 
 
-    let out_unit: &str = &cli.unit.unwrap().trim().to_lowercase();
+    let input_length_unit: &str = &cli.length_fp[1].trim().to_lowercase();
+    // let input_length_value: f32 = cli.length_fp[0].parse::<f32>().unwrap();
+
+    let input_time_unit: &str = &cli.tof[1].trim().to_lowercase();
+    // let input_time_value: f32 = cli.tof[0].parse::<f32>().unwrap();
+    
+    let length_quantity = parse_length(input_length_value, input_length_unit);
+    let time_quantity = parse_time(input_time_value, input_time_unit);
 
 
-    let out_energy: Energy = calculate_energy(t,l);
 
-    match out_unit {
-        "ev" | "electronvolt" | "electronvolts" =>  println!("Energy = {}", out_energy.into_format_args(electronvolt,Abbreviation)),
-        "kev" | "kiloelectronvolt" | "kiloelectronvolts" =>  println!("Energy = {}", out_energy.into_format_args(kiloelectronvolt,Abbreviation)),
-        "mev" | "megaelectronvolt" | "megaelectronvolts" =>  println!("Energy = {}", out_energy.into_format_args(megaelectronvolt,Abbreviation)),
-        "gev" | "gigaelectronvolt" | "gigaelectronvolts" =>  println!("Energy = {}", out_energy.into_format_args(gigaelectronvolt,Abbreviation)),
-        "j" | "joule" | "joules" =>  println!("Energy = {}", out_energy.into_format_args(joule,Abbreviation)),
-        _ => println!("Energy = {}", out_energy.into_format_args(electronvolt,Abbreviation)),
+    let output_energy_unit: &str = &cli.unit.unwrap().trim().to_lowercase();
+
+    let energy_quantity: Energy = calculate_energy(time_quantity,length_quantity);
+
+    match output_energy_unit {
+        "ev" | "electronvolt" | "electronvolts" =>  println!("Energy = {}", energy_quantity.into_format_args(electronvolt,Abbreviation)),
+        "kev" | "kiloelectronvolt" | "kiloelectronvolts" =>  println!("Energy = {}", energy_quantity.into_format_args(kiloelectronvolt,Abbreviation)),
+        "mev" | "megaelectronvolt" | "megaelectronvolts" =>  println!("Energy = {}", energy_quantity.into_format_args(megaelectronvolt,Abbreviation)),
+        "gev" | "gigaelectronvolt" | "gigaelectronvolts" =>  println!("Energy = {}", energy_quantity.into_format_args(gigaelectronvolt,Abbreviation)),
+        "j" | "joule" | "joules" =>  println!("Energy = {}", energy_quantity.into_format_args(joule,Abbreviation)),
+        _ => println!("Energy = {}", energy_quantity.into_format_args(electronvolt,Abbreviation)),
 
     }
 
-    // println!("Energy = {}", out_energy)
-
-    // println!("Energy = {}", calculate_energy(t,l).into_format_args(electronvolt,Abbreviation));
-
-    // println!("length = {:?}, TOF = {:?}", l,t);
-    // println!("length = {} {}, TOF = {} {}", cli.length_fp[0].parse::<f64>().unwrap(), cli.length_fp[1], cli.tof[0].parse::<f64>().unwrap(), cli.tof[1]);
 }
 
 
