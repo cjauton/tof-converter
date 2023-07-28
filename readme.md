@@ -18,6 +18,12 @@ The program supports the following command-line arguments:
 - `--tof` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
 - `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
 
+### Usage
+If the binary is installed or added to path.
+```bash
+tof-converter [OPTIONS] --l <LENGTH> <UNIT> --t <TOF> <UNIT>
+```
+
 ### Examples
 
 1. Calculate neutron energy in electronvolts (default unit):
