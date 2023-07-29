@@ -46,14 +46,6 @@ impl fmt::Display for DivideByZeroError {
 impl std::error::Error for DivideByZeroError {}
 
 
-// fn calculate_energy( time: Time, length: Length ) -> Energy {
-
-//     let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
-//     let energy: Energy = m * (length * length) / (2.0 *time * time);
-
-//     energy
-    
-// }
 
 fn calculate_energy(time: Time, length: Length) -> Result<Energy, DivideByZeroError> {
     let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
@@ -156,15 +148,8 @@ fn main() {
 
 
     let input_length_unit: &str = &cli.length_fp[1].trim().to_lowercase();
-    let input_time_unit: &str = &cli.tof[1].trim().to_lowercase();
 
-    // let length_quantity = match parse_length(input_length_value, input_length_unit) {
-    //     Ok(length) => length,
-    //     Err(err) => {
-    //         eprintln!("Error: {}", err);
-    //         return;
-    //     }
-    // };
+    let input_time_unit: &str = &cli.tof[1].trim().to_lowercase();
 
     let length_quantity = parse_length(input_length_value, input_length_unit).unwrap_or_else(|err| {
         eprintln!("Error: {}", err);
