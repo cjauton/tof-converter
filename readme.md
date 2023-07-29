@@ -23,7 +23,7 @@ The program supports the following command-line arguments:
 If the binary is installed or added to path.
 
 ```bash
-tof-converter [OPTIONS] --l <LENGTH> <UNIT> --t <TOF> <UNIT>
+tof-converter [OPTIONS] -l <LENGTH> <UNIT> -t <TOF> <UNIT>
 ```
 
 ### Examples
