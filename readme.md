@@ -14,16 +14,22 @@ To run the program, you need to provide the flight path length and the time-of-f
 
 The program supports the following command-line arguments:
 
-- `--length_fp` or `-l`: The flight path length with its unit (e.g., `100 meters`, `10 cm`, `2.5 km`).
-- `--tof` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
+- `--length-of-flight-path` or `-l`: The flight path length with its unit (e.g., `100 meters`, `10 cm`, `2.5 km`).
+- `--time-of-flight` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
 - `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
 
 ### Usage
 
-If the binary is installed or added to path.
+Clone the repository then compile with the `--release` flag with cargo.
 
 ```bash
-tof-converter [OPTIONS] -l <LENGTH> <UNIT> -t <TOF> <UNIT>
+cargo build --release
+```
+
+If the binary is installed or added to path you can use in any directory.
+
+```bash
+tof-converter -l <LENGTH> <UNIT> -t <TIME> <UNIT>
 ```
 
 ### Examples
@@ -31,19 +37,19 @@ tof-converter [OPTIONS] -l <LENGTH> <UNIT> -t <TOF> <UNIT>
 1. Calculate neutron energy in electronvolts (default unit):
 
     ```bash
-    cargo run -- --length_fp 1000 meters --tof 2 microseconds
+    tof-converter -l 1000 meters -t 2 microseconds
     ```
 
 2. Calculate neutron energy in megaelectronvolts:
 
     ```bash
-    cargo run -- --length_fp 50 cm --tof 0.05 seconds --unit MeV
+    tof-converter -l 50 cm -t 0.05 seconds -u MeV
     ```
 
 3. Calculate neutron energy in joules:
 
     ```bash
-    cargo run -- --length_fp 1.5 km --tof 1000 nanoseconds --unit Joules
+    tof-converter -l 1.5 km -t 1000 nanoseconds -u Joules
     ```
 
 ### Note
@@ -53,8 +59,7 @@ The application uses the `uom` crate to handle different units for length, time,
 For further information on how to use the program and available options, you can use the `--help` flag:
 
 ```bash
-cargo run -- --help
-
+tof-converter --help
 ```
 
 This will display the usage and available options for the application.
