@@ -29,7 +29,7 @@ cargo build --release
 If the binary is installed or added to path you can use in any directory.
 
 ```bash
-tof-converter -l <LENGTH> <UNIT> -t <TIME> <UNIT>
+tof-calculator -l <LENGTH> <UNIT> -t <TIME> <UNIT>
 ```
 
 ### Examples
@@ -37,19 +37,19 @@ tof-converter -l <LENGTH> <UNIT> -t <TIME> <UNIT>
 1. Calculate neutron energy in electronvolts (default unit):
 
     ```bash
-    tof-converter -l 1000 meters -t 2 microseconds
+    tof-calculator -l 1000 meters -t 2 microseconds
     ```
 
 2. Calculate neutron energy in megaelectronvolts:
 
     ```bash
-    tof-converter -l 50 cm -t 0.05 seconds -u MeV
+    tof-calculator -l 50 cm -t 0.05 seconds -u MeV
     ```
 
 3. Calculate neutron energy in joules:
 
     ```bash
-    tof-converter -l 1.5 km -t 1000 nanoseconds -u Joules
+    tof-calculator -l 1.5 km -t 1000 nanoseconds -u Joules
     ```
 
 ### Note
@@ -59,7 +59,7 @@ The application uses the `uom` crate to handle different units for length, time,
 For further information on how to use the program and available options, you can use the `--help` flag:
 
 ```bash
-tof-converter --help
+tof-calculator --help
 ```
 
 This will display the usage and available options for the application.
