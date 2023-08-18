@@ -26,7 +26,13 @@ Clone the repository then compile with the `--release` flag with cargo.
 cargo build --release
 ```
 
-If the binary is installed or added to path you can use in any directory.
+Install the binary with cargo.
+
+```bash
+cargo install --path .
+```
+
+You can then use in any directory with the following.
 
 ```bash
 tof-calculator -l <LENGTH> <UNIT> -t <TIME> <UNIT>
