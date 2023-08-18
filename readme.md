@@ -6,19 +6,7 @@ This is a simple command-line application written in Rust to calculate the energ
 
 - Rust programming language (<https://www.rust-lang.org/learn/get-started>)
 
-## How to Use
-
-To run the program, you need to provide the flight path length and the time-of-flight as command-line arguments. You can specify the units for both length and time-of-flight, as well as the desired energy unit for the output.
-
-### Command-line Arguments
-
-The program supports the following command-line arguments:
-
-- `--length-of-flight-path` or `-l`: The flight path length with its unit (e.g., `100 meters`, `10 cm`, `2.5 km`).
-- `--time-of-flight` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
-- `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
-
-### Usage
+## Installation
 
 Clone the repository then compile with the `--release` flag with cargo.
 
@@ -32,11 +20,21 @@ Install the binary with cargo.
 cargo install --path .
 ```
 
-You can then use in any directory with the following.
+## How to Use
+
+To run the program, you need to provide the flight path length and the time-of-flight as command-line arguments. You can specify the units for both length and time-of-flight, as well as the desired energy unit for the output.
 
 ```bash
 tof-calculator -l <LENGTH> <UNIT> -t <TIME> <UNIT>
 ```
+
+### Command-line Arguments
+
+The program supports the following command-line arguments:
+
+- `--length-of-flight-path` or `-l`: The flight path length with its unit (e.g., `100 meters`, `10 cm`, `2.5 km`).
+- `--time-of-flight` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
+- `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
 
 ### Examples
 
