@@ -67,7 +67,7 @@ fn parse_length(quantity: f32, unit: &str) -> Result<Length, UnsupportedUnitErro
         "cm" | "centimeter" | "centimeters" => Ok(Length::new::<centimeter>(quantity)),
         "m" | "meter" | "meters" => Ok(Length::new::<meter>(quantity)),
         "km" | "kilometer" | "kilometers" => Ok(Length::new::<kilometer>(quantity)),
-        _ => Err(UnsupportedUnitError::Length(unit.to_string()).into()),
+        _ => Err(UnsupportedUnitError::Length(unit.to_string())),
     }
 }
 
@@ -77,7 +77,7 @@ fn parse_time(quantity: f32, unit: &str) -> Result<Time, UnsupportedUnitError> {
         "mus" | "us" | "microsecond" | "microseconds" => Ok(Time::new::<microsecond>(quantity)),
         "ms" | "millisecond" | "milliseconds" => Ok(Time::new::<millisecond>(quantity)),
         "s" | "second" | "seconds" => Ok(Time::new::<second>(quantity)),
-        _ => Err(UnsupportedUnitError::Time(unit.to_string()).into()),
+        _ => Err(UnsupportedUnitError::Time(unit.to_string())),
     }
 }
 
@@ -114,7 +114,7 @@ fn parse_energy_unit(unit: &str) -> Result<EnergyUnit, UnsupportedUnitError> {
         "mev" | "megaelectronvolt" | "megaelectronvolts" => Ok(EnergyUnit::Megaelectronvolt),
         "gev" | "gigaelectronvolt" | "gigaelectronvolts" => Ok(EnergyUnit::Gigaelectronvolt),
         "j" | "joule" | "joules" => Ok(EnergyUnit::Joule),
-        _ => Err(UnsupportedUnitError::Energy(unit.to_string()).into()),
+        _ => Err(UnsupportedUnitError::Energy(unit.to_string())),
     }
 }
 
