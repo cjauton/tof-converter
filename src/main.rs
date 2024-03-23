@@ -81,6 +81,23 @@ fn parse_time(quantity: f32, unit: &str) -> Result<Time, UnsupportedUnitError> {
     }
 }
 
+fn parse_energy(quantity: f32, unit: &str) -> Result<Energy, UnsupportedUnitError> {
+    match unit.trim().to_lowercase().as_str() {
+        "eV" | "electron volt" | "electron volts" => Ok(Energy::new::<electronvolt>(quantity)),
+        "keV" | "kiloelectron volt" | "kiloelectron volts" => {
+            Ok(Energy::new::<kiloelectronvolt>(quantity))
+        }
+        "MeV" | "megaelectron volt" | "megaelectron volts" => {
+            Ok(Energy::new::<megaelectronvolt>(quantity))
+        }
+        "GeV" | "gigaelectron volt" | "gigaelectron volts" => {
+            Ok(Energy::new::<gigaelectronvolt>(quantity))
+        }
+        "J" | "joule" | "joules" => Ok(Energy::new::<joule>(quantity)),
+        _ => Err(UnsupportedUnitError::Energy(unit.to_string())),
+    }
+}
+
 // Enum for supported units
 enum EnergyUnit {
     Electronvolt,
