@@ -1,5 +1,6 @@
 use clap::Parser;
 use std::error::Error;
+use std::f32::consts::SQRT_2;
 use std::fmt;
 use uom::fmt::DisplayStyle::Abbreviation;
 use uom::si::energy::{electronvolt, gigaelectronvolt, joule, kiloelectronvolt, megaelectronvolt};
@@ -59,6 +60,24 @@ fn calculate_energy(time: Time, length: Length) -> Result<Energy, DivideByZeroEr
     let energy: Energy = m * (length * length) / (2.0 * time * time);
 
     Ok(energy)
+}
+
+fn calculate_time_of_flight(energy: Energy, length: Length) -> Result<Time, DivideByZeroError> {
+    let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
+
+    // Check if either energy or length is zero
+    if energy == Energy::new::<electronvolt>(0.0) {
+        return Err(DivideByZeroError::TimeIsZero);
+    }
+    if length == Length::new::<meter>(0.0) {
+        return Err(DivideByZeroError::LengthIsZero);
+    }
+
+    // let energy: Energy = m * (length * length) / (2.0 * time * time);
+
+    let time: Time = (m * length * length / 2.0 / energy).sqrt();
+
+    Ok(time)
 }
 
 // Functions to parse length and time inputs
