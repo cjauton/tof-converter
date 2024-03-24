@@ -9,3 +9,7 @@ edition = "2021"
 clap = { version = "4.5.3", features = ["cargo"] }
 thiserror = "1.0.58"
 uom = "0.36.0"
+
+[[bin]]
+name = "tof-convert"
+path = "src/main.rs"
