@@ -236,36 +236,30 @@ fn main() {
                 std::process::exit(1);
             });
 
-            match energy_unit {
+            let formatted_energy = match energy_unit {
                 EnergyUnit::Electronvolt => {
-                    println!(
-                        "Energy = {}",
-                        energy_quantity.into_format_args(electronvolt, Abbreviation)
-                    )
+                    let a = energy_quantity.into_format_args(electronvolt, Abbreviation);
+                    format!("{}", a)
                 }
                 EnergyUnit::Kiloelectronvolt => {
-                    println!(
-                        "Energy = {}",
-                        energy_quantity.into_format_args(kiloelectronvolt, Abbreviation)
-                    )
+                    let a = energy_quantity.into_format_args(kiloelectronvolt, Abbreviation);
+                    format!("{}", a)
                 }
                 EnergyUnit::Megaelectronvolt => {
-                    println!(
-                        "Energy = {}",
-                        energy_quantity.into_format_args(megaelectronvolt, Abbreviation)
-                    )
+                    let a = energy_quantity.into_format_args(megaelectronvolt, Abbreviation);
+                    format!("{}", a)
                 }
                 EnergyUnit::Gigaelectronvolt => {
-                    println!(
-                        "Energy = {}",
-                        energy_quantity.into_format_args(gigaelectronvolt, Abbreviation)
-                    )
+                    let a = energy_quantity.into_format_args(gigaelectronvolt, Abbreviation);
+                    format!("{}", a)
                 }
-                EnergyUnit::Joule => println!(
-                    "Energy = {}",
-                    energy_quantity.into_format_args(joule, Abbreviation)
-                ),
-            }
+                EnergyUnit::Joule => {
+                    let a = energy_quantity.into_format_args(joule, Abbreviation);
+                    format!("{}", a)
+                }
+            };
+
+            println!("Energy = {}", formatted_energy);
         }
 
         _ => unreachable!("Exhausted list of subcommands and subcommand_required prevents `None`"),
