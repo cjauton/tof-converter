@@ -1,5 +1,5 @@
 [package]
-name = "tof-calculator"
+name = "tof-converter"
 version = "0.1.0"
 edition = "2021"
 
