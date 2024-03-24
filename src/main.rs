@@ -1,5 +1,4 @@
 use clap::{command, Arg, Command};
-use std::error::Error;
 use std::fmt;
 use uom::fmt::DisplayStyle::Abbreviation;
 use uom::si::energy::{electronvolt, gigaelectronvolt, joule, kiloelectronvolt, megaelectronvolt};
@@ -26,55 +25,14 @@ impl fmt::Display for UnsupportedUnitError {
     }
 }
 
-impl Error for UnsupportedUnitError {}
-
-#[derive(Debug)]
-enum DivideByZeroError {
-    LengthIsZero,
-    TimeIsZero,
-}
-
-impl fmt::Display for DivideByZeroError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            DivideByZeroError::LengthIsZero => write!(f, "Length is zero, cannot divide by zero"),
-            DivideByZeroError::TimeIsZero => write!(f, "Time is zero, cannot divide by zero"),
-        }
-    }
-}
-
-impl std::error::Error for DivideByZeroError {}
-
-fn calculate_energy(time: Time, length: Length) -> Result<Energy, DivideByZeroError> {
+fn calculate_energy(time: Time, length: Length) -> Energy {
     let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
-
-    // Check if either time or length is zero
-    if time == Time::new::<second>(0.0) {
-        return Err(DivideByZeroError::TimeIsZero);
-    }
-    if length == Length::new::<meter>(0.0) {
-        return Err(DivideByZeroError::LengthIsZero);
-    }
-
-    let energy: Energy = m * (length * length) / (2.0 * time * time);
-
-    Ok(energy)
+    m * (length * length) / (2.0 * time * time)
 }
 
-fn calculate_time_of_flight(energy: Energy, length: Length) -> Result<Time, DivideByZeroError> {
+fn calculate_time_of_flight(energy: Energy, length: Length) -> Time {
     let m = uom::si::f32::Mass::new::<kilogram>(1.67493e-27_f32);
-
-    // Check if either energy or length is zero
-    if energy == Energy::new::<electronvolt>(0.0) {
-        return Err(DivideByZeroError::TimeIsZero);
-    }
-    if length == Length::new::<meter>(0.0) {
-        return Err(DivideByZeroError::LengthIsZero);
-    }
-
-    let time: Time = (m * length * length / 2.0 / energy).sqrt();
-
-    Ok(time)
+    (m * length * length / 2.0 / energy).sqrt()
 }
 
 // Functions to parse length and time inputs
@@ -276,11 +234,7 @@ fn main() {
                     std::process::exit(1);
                 });
 
-            let energy_quantity: Energy = calculate_energy(time_quantity, length_quantity)
-                .unwrap_or_else(|err| {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                });
+            let energy_quantity: Energy = calculate_energy(time_quantity, length_quantity);
 
             let energy_unit = parse_energy_unit(output_energy_unit).unwrap_or_else(|err| {
                 eprintln!("Error: {}", err);
@@ -359,11 +313,7 @@ fn main() {
                     std::process::exit(1);
                 });
 
-            let time_quantity: Time = calculate_time_of_flight(energy_quantity, length_quantity)
-                .unwrap_or_else(|err| {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                });
+            let time_quantity: Time = calculate_time_of_flight(energy_quantity, length_quantity);
 
             let time_unit = parse_time_unit(output_time_unit).unwrap_or_else(|err| {
                 eprintln!("Error: {}", err);
