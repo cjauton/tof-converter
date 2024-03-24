@@ -111,12 +111,14 @@ fn parse_time_unit(unit: &str) -> Result<TimeUnit, Box<dyn std::error::Error>> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = command!() // requires `cargo` feature
+        .about("Convert neutron energy and neutron time-of-flight") 
         .propagate_version(true)
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
             Command::new("to_energy")
                 .about("Converts neutron time-of-flight to neutron energy")
+                .short_flag('E')
                 .arg(
                     Arg::new("length_of_flight_path")
                         .help("Flight path length from source to target in units of (cm, m, km)")
@@ -149,6 +151,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .subcommand(
             Command::new("to_tof")
                 .about("Converts neutron energy to neutron time-of-flight")
+                .short_flag('T')
                 .arg(
                     Arg::new("length_of_flight_path")
                         .help("Flight path length from source to target in units of (cm, m, km)")
