@@ -99,17 +99,17 @@ fn parse_time(quantity: f32, unit: &str) -> Result<Time, UnsupportedUnitError> {
 
 fn parse_energy(quantity: f32, unit: &str) -> Result<Energy, UnsupportedUnitError> {
     match unit.trim().to_lowercase().as_str() {
-        "eV" | "electron volt" | "electron volts" => Ok(Energy::new::<electronvolt>(quantity)),
-        "keV" | "kiloelectron volt" | "kiloelectron volts" => {
+        "ev" | "electronvolt" | "electronvolts" => Ok(Energy::new::<electronvolt>(quantity)),
+        "kev" | "kiloelectronvolt" | "kiloelectronvolts" => {
             Ok(Energy::new::<kiloelectronvolt>(quantity))
         }
-        "MeV" | "megaelectron volt" | "megaelectron volts" => {
+        "mev" | "megaelectronvolt" | "megaelectronvolts" => {
             Ok(Energy::new::<megaelectronvolt>(quantity))
         }
-        "GeV" | "gigaelectron volt" | "gigaelectron volts" => {
+        "gev" | "gigaelectronvolt" | "gigaelectronvolts" => {
             Ok(Energy::new::<gigaelectronvolt>(quantity))
         }
-        "J" | "joule" | "joules" => Ok(Energy::new::<joule>(quantity)),
+        "j" | "joule" | "joules" => Ok(Energy::new::<joule>(quantity)),
         _ => Err(UnsupportedUnitError::Energy(unit.to_string())),
     }
 }
@@ -123,6 +123,14 @@ enum EnergyUnit {
     Joule,
 }
 
+// Enum for supported units
+enum TimeUnit {
+    Nanosecond,
+    Microsecond,
+    Millisecond,
+    Second,
+}
+
 // Function to parse energy unit input
 fn parse_energy_unit(unit: &str) -> Result<EnergyUnit, UnsupportedUnitError> {
     match unit.trim().to_lowercase().as_str() {
@@ -132,6 +140,17 @@ fn parse_energy_unit(unit: &str) -> Result<EnergyUnit, UnsupportedUnitError> {
         "gev" | "gigaelectronvolt" | "gigaelectronvolts" => Ok(EnergyUnit::Gigaelectronvolt),
         "J" | "joule" | "joules" => Ok(EnergyUnit::Joule),
         _ => Err(UnsupportedUnitError::Energy(unit.to_string())),
+    }
+}
+
+// Function to parse  time unit input
+fn parse_time_unit(unit: &str) -> Result<TimeUnit, UnsupportedUnitError> {
+    match unit.trim().to_lowercase().as_str() {
+        "ns" | "nanosecond" | "nanoseconds" => Ok(TimeUnit::Nanosecond),
+        "mus" | "us" | "microsecond" | "microseconds" => Ok(TimeUnit::Microsecond),
+        "ms" | "millisecond" | "milliseconds" => Ok(TimeUnit::Millisecond),
+        "s" | "second" | "seconds" => Ok(TimeUnit::Second),
+        _ => Err(UnsupportedUnitError::Time(unit.to_string())),
     }
 }
 
@@ -170,6 +189,38 @@ fn main() {
                         .value_name("UNIT")
                         .num_args(1)
                         .default_value("eV")
+                ),
+        )
+        .subcommand(
+            Command::new("to_tof")
+                .about("Converts neutron energy to neutron time-of-flight")
+                .arg(
+                    Arg::new("length_of_flight_path")
+                        .help("Flight path length from source to target in units of (cm, m, km)")
+                        .short('l')
+                        .long("length-of-flight-path")
+                        .required(true)
+                        .value_names(&["LENGTH", "UNIT"])
+                        .num_args(2)
+                )
+                .arg(
+                    Arg::new("energy")
+                        .help("Energy to convert to neutron time-of-flight in units of (eV, KeE, MeV, GeV J)")
+                        .short('e')
+                        .long("energy")
+                        .required(true)
+                        .value_names(&["ENERGY", "UNIT"])
+                        .num_args(2)
+                )
+                .arg(
+                    Arg::new("unit")
+                        .help("Desired neutron time-of-flight units of (ns, us, ms, s)")
+                        .short('u')
+                        .long("unit")
+                        .required(false)
+                        .value_name("UNIT")
+                        .num_args(1)
+                        .default_value("us")
                 ),
         )
         .get_matches();
@@ -260,6 +311,85 @@ fn main() {
             };
 
             println!("Energy = {}", formatted_energy);
+        }
+        Some(("to_tof", sub_matches)) => {
+            // Parse length
+            let length_of_flight_path: Vec<_> = sub_matches
+                .get_many::<String>("length_of_flight_path")
+                .unwrap()
+                .collect();
+
+            let input_length_value: f32 = match length_of_flight_path[0].parse::<f32>() {
+                Ok(value) => value,
+                Err(err) => {
+                    eprintln!("Error: parsing length value: {}", err);
+                    return;
+                }
+            };
+
+            let input_length_unit: &str = &length_of_flight_path[1].trim().to_lowercase();
+
+            // Parse time
+            let energy: Vec<_> = sub_matches.get_many::<String>("energy").unwrap().collect();
+
+            let input_energy_value: f32 = match energy[0].parse() {
+                Ok(value) => value,
+                Err(err) => {
+                    eprintln!("Error: parsing energy value: {}", err);
+                    return;
+                }
+            };
+
+            let input_energy_unit: &str = &energy[1].trim().to_lowercase();
+
+            // Parse unit
+            let unit: _ = sub_matches.get_one::<String>("unit").unwrap();
+
+            let output_time_unit: &str = &unit.trim().to_lowercase();
+
+            let length_quantity = parse_length(input_length_value, input_length_unit)
+                .unwrap_or_else(|err| {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                });
+
+            let energy_quantity = parse_energy(input_energy_value, input_energy_unit)
+                .unwrap_or_else(|err| {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                });
+
+            let time_quantity: Time = calculate_time_of_flight(energy_quantity, length_quantity)
+                .unwrap_or_else(|err| {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                });
+
+            let time_unit = parse_time_unit(output_time_unit).unwrap_or_else(|err| {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
+            });
+
+            let formatted_energy = match time_unit {
+                TimeUnit::Nanosecond => {
+                    let a = time_quantity.into_format_args(nanosecond, Abbreviation);
+                    format!("{}", a)
+                }
+                TimeUnit::Microsecond => {
+                    let a = time_quantity.into_format_args(microsecond, Abbreviation);
+                    format!("{}", a)
+                }
+                TimeUnit::Millisecond => {
+                    let a = time_quantity.into_format_args(millisecond, Abbreviation);
+                    format!("{}", a)
+                }
+                TimeUnit::Second => {
+                    let a = time_quantity.into_format_args(second, Abbreviation);
+                    format!("{}", a)
+                }
+            };
+
+            println!("TOF = {}", formatted_energy);
         }
 
         _ => unreachable!("Exhausted list of subcommands and subcommand_required prevents `None`"),
