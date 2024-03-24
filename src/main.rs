@@ -137,7 +137,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .arg(
                     Arg::new("unit")
-                        .help("Desired neutron energy units of (eV, KeE, MeV, J)")
+                        .help("Desired neutron energy units of (eV, KeE, MeV, GeV J)")
                         .short('u')
                         .long("unit")
                         .required(false)
