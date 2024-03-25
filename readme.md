@@ -1,6 +1,6 @@
-# Neutron Energy Calculator
+# Neutron TOF Converter
 
-This is a simple command-line application written in Rust to calculate the energy of a neutron given the flight path length and the time-of-flight. It uses the `uom` crate for handling units, providing flexibility to work with various unit systems.
+This is a simple command-line application written in Rust to convert between energy and time-of-flight for non-relativistic neutrons given the flight-path-length. The tool use `clap` for command line parsing and the `uom` crate for handling units, providing flexibility to work with various common units.
 
 ## Prerequisites
 
@@ -22,52 +22,63 @@ cargo install --path .
 
 ## How to Use
 
-To run the program, you need to provide the flight path length and the time-of-flight as command-line arguments. You can specify the units for both length and time-of-flight, as well as the desired energy unit for the output.
+### Converting to Neutron Energy
+
+Use the `to_energy` or `-E` subcommand to convert from time-of-flight to energy by providing the flight-path-length and the time-of-flight.
 
 ```bash
-tof-calculator -l <LENGTH> <UNIT> -t <TIME> <UNIT>
+tof-convert to_energy -l <LENGTH> <UNIT> -t <TIME> <UNIT>
 ```
-
-### Command-line Arguments
 
 The program supports the following command-line arguments:
 
-- `--length-of-flight-path` or `-l`: The flight path length with its unit (e.g., `100 meters`, `10 cm`, `2.5 km`).
-- `--time-of-flight` or `-t`: The time-of-flight with its unit (e.g., `500 ns`, `2 ms`, `0.05 s`).
-- `--unit` or `-u`: The desired unit for the output energy (e.g., `eV`, `MeV`, `Joules`). Default unit is `eV`.
+- `--length-of-flight-path` or `-l`: The flight path length with its unit (`cm`, `m`, `km`).
+- `--time-of-flight` or `-t`: The time-of-flight with its unit (`ns`, `us`, `ms`, `s`).
+- `--unit` or `-u`: The desired unit for the output energy (`eV`,`keV`, `MeV`, `GeV`, `Js`). Default unit is `eV`.
+
+### Converting to Neutron Time-of-Flight
+
+Use the `to_tof` or `-T` subcommand to convert from energy to time-of-flight by providing the flight-path-length and the energy.
+
+```bash
+tof-convert to_tof -l <LENGTH> <UNIT> -e <ENERGY> <UNIT>
+```
+
+The program supports the following command-line arguments:
+
+- `--length-of-flight-path` or `-l`: The flight path length with its unit (`cm`, `m`, `km`).
+- `--energy` or `-e`: The energy with its unit (`eV`,`keV`, `MeV`, `GeV`, `Js`).
+- `--unit` or `-u`: The desired unit for the output energy (`ns`, `us`, `ms`, `s`). Default unit is `us`.
+
 
 ### Examples
 
 1. Calculate neutron energy in electronvolts (default unit):
 
     ```bash
-    tof-calculator -l 1000 meters -t 2 microseconds
+    tof-convert to_energy -l 1000 meters -t 2 microseconds
     ```
 
-2. Calculate neutron energy in megaelectronvolts:
+2. Calculate neutron time-of-flight in nanoseconds:
 
     ```bash
-    tof-calculator -l 50 cm -t 0.05 seconds -u MeV
+    tof-convert -T -l 50 cm -t 20 eV -u ns
     ```
 
 3. Calculate neutron energy in joules:
 
     ```bash
-    tof-calculator -l 1.5 km -t 1000 nanoseconds -u Joules
+    tof-convert -E -l 1.5 km -t 1000 nanoseconds -u Joules
     ```
 
 ### Note
 
 The application uses the `uom` crate to handle different units for length, time, and energy. Please make sure to provide valid unit representations in the command-line arguments.
 
-For further information on how to use the program and available options, you can use the `--help` flag:
+For further information on how to use the program and available options, you can use the `--help` or `-h` flag:
 
 ```bash
-tof-calculator --help
+tof-convert --help
 ```
 
 This will display the usage and available options for the application.
-
-Please note that the provided code snippet is just a part of the actual application, and it assumes the existence of the required dependencies (`clap` and `uom`) in the Cargo.toml file.
-
-The given code is a useful start, and you can extend it to add more features, error handling, or even create a full-fledged CLI tool for neutron energy calculations with various units.
