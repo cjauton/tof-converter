@@ -50,7 +50,6 @@ The program supports the following command-line arguments:
 - `--energy` or `-e`: The energy with its unit (`eV`,`keV`, `MeV`, `GeV`, `Js`).
 - `--unit` or `-u`: The desired unit for the output energy (`ns`, `us`, `ms`, `s`). Default unit is `us`.
 
-
 ### Examples
 
 1. Calculate neutron energy in electronvolts (default unit):
